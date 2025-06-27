@@ -1,0 +1,86 @@
+package component
+
+import (
+	"time"
+	"github.com/gkits/kurz/internal/types"
+	"fmt"
+)
+
+templ LinkListRow(link types.Link) {
+	<tr id={ fmt.Sprintf("link-%d", link.ID) }>
+		<td><a href={ link.Target } target="_blank">{ link.Target }</a></td>
+		<td>{ link.CreatedAt.Format("2006-01-02 15:04") }</td>
+		<td>{ link.CreatedBy }</td>
+		<td>
+			if link.ExpiresAt.Valid {
+				{ link.ExpiresAt.Time.Format("2006-01-02 15:04") }
+			} else {
+				<span>Never</span>
+			}
+		</td>
+		<td>
+			<button
+				hx-get={ fmt.Sprintf("/links/%d", link.ID) }
+				hx-target="#link-detail"
+				hx-swap="innerHTML"
+				class="btn btn-info"
+			>
+				View
+			</button>
+			<button
+				hx-delete={ "/links/" + link.Ref }
+				hx-confirm="Are you sure you want to delete this link?"
+				hx-target="#link-list-body"
+				hx-swap="outerHTML"
+				class="btn btn-danger"
+			>
+				Delete
+			</button>
+		</td>
+	</tr>
+}
+
+templ LinkList(links []types.Link) {
+	<div id="link-list-container">
+		<table>
+			<thead>
+				<tr>
+					<th>Target</th>
+					<th>Created At</th>
+					<th>Created By</th>
+					<th>Expires At</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody id="link-list-body">
+				for _, link := range links {
+					@LinkListRow(link)
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+templ CreateLinkForm() {
+	<form
+		hx-post="/links"
+		hx-target="#link-list-body"
+		hx-swap="beforeend"
+	>
+		<div>
+			<label for="target">Target:</label>
+			<input type="url" id="target" name="target" required/>
+		</div>
+		<div>
+			<label for="expires_at">Expires At:</label>
+			<input
+				type="datetime-local"
+				id="expires_at"
+				name="expires_at"
+				min={ time.Now().String() }
+			/>
+		</div>
+		<button type="submit">Create Link</button>
+	</form>
+	<div id="create-link-message" style="color: red;"></div>
+}

@@ -1,0 +1,27 @@
+package page
+
+import "github.com/gkits/kurz/internal/views/component"
+import "github.com/gkits/kurz/internal/types"
+
+templ Home() {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Link Shortener</title>
+			<script src="https://unpkg.com/htmx.org@1.9.12"></script>
+			// You might want to add some CSS here as well
+		</head>
+		<body>
+			<div id="app">
+				@content()
+			</div>
+		</body>
+	</html>
+}
+
+templ content() {
+	@component.CreateLinkForm()
+	@component.LinkList([]types.Link{})
+}
