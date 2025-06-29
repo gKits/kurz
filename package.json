@@ -1,0 +1,26 @@
+{
+  "name": "kurz",
+  "version": "1.0.0",
+  "description": "<div align=\"center\">   <a href=\"https://github.com/gkits/kurz\">     <img src=\"public/logo.png\" alt=\"Logo\" width=\"120\" height=\"120\">   </a>   <h1 align=\"center\">Kurz</h1>   <p align=\"center\">     Make your URL's kurz.   </p> </div>",
+  "main": "daisyui-theme.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gkits/kurz.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gkits/kurz/issues"
+  },
+  "homepage": "https://github.com/gkits/kurz#readme",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.11",
+    "@tailwindcss/typography": "^0.5.16",
+    "daisyui": "^5.0.43",
+    "tailwindcss": "^4.1.11"
+  }
+}

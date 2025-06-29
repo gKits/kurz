@@ -9,9 +9,10 @@ templ Home() {
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			<title>Link Shortener</title>
-			<script src="https://unpkg.com/htmx.org@1.9.12"></script>
-			// You might want to add some CSS here as well
+			<title>Kurz</title>
+			<link rel="icon" type="image/x-icon" href="/public/favicon.ico"/>
+			<link href="/public/styles.css" rel="stylesheet"/>
+			<script src="https://unpkg.com/htmx.org@2.0.6"></script>
 		</head>
 		<body>
 			<div id="app">
@@ -22,6 +23,9 @@ templ Home() {
 }
 
 templ content() {
-	@component.CreateLinkForm()
-	@component.LinkList([]types.Link{})
+	<div class="w-4/5 flex justify-center items-center">
+		@component.Navbar("kurz")
+		@component.CreateLinkForm()
+		@component.LinkList([]types.Link{})
+	</div>
 }

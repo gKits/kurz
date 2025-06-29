@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://github.com/gkits/kurz">
-    <img src="assets/logo.png" alt="Logo" width="120" height="120">
+    <img src="public/logo.png" alt="Logo" width="120" height="120">
   </a>
   <h1 align="center">Kurz</h1>
   <p align="center">

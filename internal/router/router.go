@@ -1,27 +1,40 @@
 package router
 
 import (
-	"fmt"
-	"net/http"
-	"strconv"
+	"os"
 
 	"github.com/a-h/templ"
-	"github.com/gkits/kurz/internal/db"
-	"github.com/gkits/kurz/internal/types"
-	"github.com/gkits/kurz/internal/views/component"
-	"github.com/gkits/kurz/internal/views/page"
-	"github.com/gorilla/schema"
+	fs "github.com/gkits/kurz"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/gommon/log"
+	"github.com/ziflex/lecho/v3"
+
+	"github.com/go-playground/validator"
 )
 
 func New() *echo.Echo {
 	e := echo.New()
+	e.HideBanner = true
 
+	log := lecho.New(
+		os.Stdout,
+		lecho.WithLevel(log.DEBUG),
+		lecho.WithTimestamp(),
+	)
+	e.Logger = log
+
+	e.Validator = &eValidator{validator.New()}
+
+	e.Use(middleware.RequestID())
+	e.Use(lecho.Middleware(lecho.Config{
+		Logger: log,
+	}))
 	e.Use(middleware.AddTrailingSlash())
 
 	e.GET("/", handleHome)
 	e.GET("/r/:ref", handleRedirectToLink)
+	e.StaticFS("/public", echo.MustSubFS(fs.Public(), "public"))
 
 	e.GET("/links", handleGetLinks)
 	e.POST("/links", handleCreateLink)
@@ -29,65 +42,6 @@ func New() *echo.Echo {
 	e.DELETE("/links/:id", handleDeleteLink)
 
 	return e
-}
-
-func handleHome(ctx echo.Context) error {
-	fmt.Println("hello")
-	return render(ctx, page.Home())
-}
-
-func handleGetLink(ctx echo.Context) error {
-	id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
-	if err != nil {
-		return echo.ErrBadRequest
-	}
-	link, err := db.GetLinkByID(ctx.Request().Context(), int64(id))
-	if err != nil {
-		return echo.ErrInternalServerError
-	}
-	return render(ctx, component.LinkListRow(link))
-}
-
-func handleGetLinks(ctx echo.Context) error {
-	var q types.LinkQuery
-	if err := schema.NewDecoder().Decode(&q, ctx.QueryParams()); err != nil {
-		return echo.ErrBadRequest
-	}
-	links, err := db.GetLinks(ctx.Request().Context(), types.LinkQuery{})
-	if err != nil {
-		return err
-	}
-	return render(ctx, component.LinkList(links))
-}
-
-func handleCreateLink(ctx echo.Context) error {
-	var linkCreate types.LinkCreate
-	if err := ctx.Bind(&linkCreate); err != nil {
-		fmt.Println(err)
-		return echo.ErrBadRequest
-	}
-	fmt.Println(linkCreate)
-	return nil
-}
-
-func handleDeleteLink(ctx echo.Context) error {
-	id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
-	if err != nil {
-		return echo.ErrBadRequest
-	}
-	if err := db.DeleteLink(ctx.Request().Context(), id); err != nil {
-		return echo.ErrInternalServerError
-	}
-	return ctx.NoContent(http.StatusNoContent)
-}
-
-func handleRedirectToLink(ctx echo.Context) error {
-	ref := ctx.Param("ref")
-	link, err := db.GetLinkByRef(ctx.Request().Context(), ref)
-	if err != nil {
-		return err
-	}
-	return ctx.Redirect(http.StatusMovedPermanently, link.Target)
 }
 
 func render(ctx echo.Context, component templ.Component) error {

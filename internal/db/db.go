@@ -2,8 +2,7 @@ package db
 
 import (
 	"context"
-	"errors"
-	"fmt"
+	"database/sql"
 	"sync"
 
 	"github.com/gkits/kurz/internal/types"
@@ -15,28 +14,14 @@ var (
 	once sync.Once
 )
 
-func Init(connStr string) (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			if recoveredErr, ok := r.(error); ok {
-				err = fmt.Errorf("db: failed to initialize: %w", recoveredErr)
-				return
-			}
-			err = errors.New("db: failed to initialize")
-		}
-	}()
+func Init(conn *sql.DB, driver string) {
 	once.Do(func() {
-		conn, err := sqlx.Open("sqlite", connStr)
-		if err != nil {
-			panic(err)
-		}
-		db = conn
+		db = sqlx.NewDb(conn, driver)
 	})
-	return nil
 }
 
 func GetLinkByID(ctx context.Context, id int64) (types.Link, error) {
-	const query = `SELECT * FROM links WHERE id = $1`
+	const query = `SELECT * FROM links WHERE id = $1;`
 
 	var link types.Link
 	if err := db.GetContext(ctx, &link, query, id); err != nil {
@@ -46,7 +31,7 @@ func GetLinkByID(ctx context.Context, id int64) (types.Link, error) {
 }
 
 func GetLinkByRef(ctx context.Context, ref string) (types.Link, error) {
-	const query = `SELECT * FROM links WHERE ref = $1`
+	const query = `SELECT * FROM links WHERE ref = $1;`
 
 	var link types.Link
 	if err := db.GetContext(ctx, &link, query, ref); err != nil {
@@ -56,7 +41,7 @@ func GetLinkByRef(ctx context.Context, ref string) (types.Link, error) {
 }
 
 func GetLinks(ctx context.Context, q types.LinkQuery) ([]types.Link, error) {
-	const query = `SELECT * FROM links WHERE id = $1`
+	const query = `SELECT * FROM links WHERE id = $1;`
 
 	var links []types.Link
 	if err := db.SelectContext(ctx, &links, query); err != nil {
@@ -66,16 +51,16 @@ func GetLinks(ctx context.Context, q types.LinkQuery) ([]types.Link, error) {
 }
 
 func InsertLink(ctx context.Context, link types.Link) (types.Link, error) {
-	const query = `INSERT INTO links VALUES (ref, target, created_by, created_at, expires_at)`
+	const query = `
+		INSERT INTO links (ref, target, created_by, created_at, expires_at)
+		VALUES ($1, $2, $3, $4, $5);`
 
-	rows, err := db.NamedQueryContext(ctx, query, link)
+	res, err := db.ExecContext(ctx, query, link.Ref, link.Target, link.CreatedBy, link.CreatedAt, link.ExpiresAt)
 	if err != nil {
 		return types.Link{}, err
 	}
-	defer func() { _ = rows.Close() }()
-
-	rows.Next()
-	if err := rows.Scan(link.ID); err != nil {
+	link.ID, err = res.LastInsertId()
+	if err != nil {
 		return types.Link{}, err
 	}
 	return link, nil

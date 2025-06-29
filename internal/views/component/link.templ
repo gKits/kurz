@@ -7,8 +7,8 @@ import (
 )
 
 templ LinkListRow(link types.Link) {
-	<tr id={ fmt.Sprintf("link-%d", link.ID) }>
-		<td><a href={ link.Target } target="_blank">{ link.Target }</a></td>
+	<tr id={ fmt.Sprintf("link-%d", link.ID) } class="hover:bg-base-300">
+		<td><a href={ link.Target } target="_blank" class="link link-primary">{ link.Target }</a></td>
 		<td>{ link.CreatedAt.Format("2006-01-02 15:04") }</td>
 		<td>{ link.CreatedBy }</td>
 		<td>
@@ -28,7 +28,7 @@ templ LinkListRow(link types.Link) {
 				View
 			</button>
 			<button
-				hx-delete={ "/links/" + link.Ref }
+				hx-delete={ fmt.Sprintf("/links/%d", link.ID) }
 				hx-confirm="Are you sure you want to delete this link?"
 				hx-target="#link-list-body"
 				hx-swap="outerHTML"
@@ -41,10 +41,11 @@ templ LinkListRow(link types.Link) {
 }
 
 templ LinkList(links []types.Link) {
-	<div id="link-list-container">
-		<table>
+	<div id="link-list-container" class="overflow-x-auto">
+		<table class="table">
 			<thead>
 				<tr>
+					<th></th>
 					<th>Target</th>
 					<th>Created At</th>
 					<th>Created By</th>
@@ -69,7 +70,7 @@ templ CreateLinkForm() {
 	>
 		<div>
 			<label for="target">Target:</label>
-			<input type="url" id="target" name="target" required/>
+			@urlInput("target", "target")
 		</div>
 		<div>
 			<label for="expires_at">Expires At:</label>
@@ -83,4 +84,32 @@ templ CreateLinkForm() {
 		<button type="submit">Create Link</button>
 	</form>
 	<div id="create-link-message" style="color: red;"></div>
+}
+
+templ urlInput(id, name string) {
+	<label class="input validator">
+		<svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+			<g
+				stroke-linejoin="round"
+				stroke-linecap="round"
+				stroke-width="2.5"
+				fill="none"
+				stroke="currentColor"
+			>
+				<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+				<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+			</g>
+		</svg>
+		<input
+			id={ id }
+			name={ name }
+			type="url"
+			required
+			placeholder="https://"
+			value="https://"
+			pattern="^(https?://)?([a-zA-Z0-9]([a-zA-Z0-9\-].*[a-zA-Z0-9])?\.)+[a-zA-Z].*$"
+			title="Must be valid URL"
+		/>
+	</label>
+	<p class="validator-hint">Must be valid URL</p>
 }
