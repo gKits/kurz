@@ -41,12 +41,23 @@ func GetLinkByRef(ctx context.Context, ref string) (types.Link, error) {
 }
 
 func GetLinks(ctx context.Context, q types.LinkQuery) ([]types.Link, error) {
-	const query = `SELECT * FROM links WHERE id = $1;`
+	const query = `SELECT * FROM links;`
 
-	var links []types.Link
-	if err := db.SelectContext(ctx, &links, query); err != nil {
+	rows, err := db.NamedQueryContext(ctx, query, q)
+	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
+
+	var links []types.Link
+	for rows.Next() {
+		var link types.Link
+		if err := rows.StructScan(&link); err != nil {
+			return nil, err
+		}
+		links = append(links, link)
+	}
+
 	return links, nil
 }
 
