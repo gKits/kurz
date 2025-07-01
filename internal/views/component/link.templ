@@ -4,6 +4,7 @@ import (
 	"time"
 	"github.com/gkits/kurz/internal/types"
 	"fmt"
+	// "github.com/bryanvaz/go-templ-lucide-icons" // this currently does not work
 )
 
 templ LinkListRow(link types.Link) {
@@ -20,18 +21,7 @@ templ LinkListRow(link types.Link) {
 		</td>
 		<td>
 			<button
-				hx-get={ fmt.Sprintf("/links/%d", link.ID) }
-				hx-target="#link-detail"
-				hx-swap="innerHTML"
-				class="btn btn-info"
-			>
-				View
-			</button>
-			<button
 				hx-delete={ fmt.Sprintf("/links/%d", link.ID) }
-				hx-confirm="Are you sure you want to delete this link?"
-				hx-target="#link-list-body"
-				hx-swap="outerHTML"
 				class="btn btn-danger"
 			>
 				Delete
@@ -45,7 +35,6 @@ templ LinkList(links []types.Link) {
 		<table class="table">
 			<thead>
 				<tr>
-					<th></th>
 					<th>Target</th>
 					<th>Created At</th>
 					<th>Created By</th>
@@ -53,7 +42,12 @@ templ LinkList(links []types.Link) {
 					<th></th>
 				</tr>
 			</thead>
-			<tbody id="link-list-body">
+			<tbody
+				id="link-list-body"
+				hx-target="closest tr"
+				hx-confirm="Are you sure you want to delete this link?"
+				hx-swap="outerHTML swap:1s"
+			>
 				for _, link := range links {
 					@LinkListRow(link)
 				}
@@ -63,27 +57,37 @@ templ LinkList(links []types.Link) {
 }
 
 templ CreateLinkForm() {
-	<form
-		hx-post="/links"
-		hx-target="#link-list-body"
-		hx-swap="beforeend"
-	>
-		<div>
-			<label for="target">Target:</label>
-			@urlInput("target", "target")
-		</div>
-		<div>
-			<label for="expires_at">Expires At:</label>
-			<input
-				type="datetime-local"
-				id="expires_at"
-				name="expires_at"
-				min={ time.Now().String() }
-			/>
-		</div>
-		<button type="submit">Create Link</button>
-	</form>
-	<div id="create-link-message" style="color: red;"></div>
+	<div class="flex justify-center w-full">
+		<form
+			hx-post="/links"
+			hx-target="#link-list-body"
+			hx-swap="beforeend"
+			class="w-full"
+		>
+			<div class="flex flex-row">
+				<div class="flex-1">
+					<label for="target" class="label">Target:</label>
+					@urlInput("target", "target")
+				</div>
+				<div class="flex-1">
+					<label for="expires_at" class="label">Expires At:</label>
+					<input
+						type="datetime-local"
+						id="expires_at"
+						name="expires_at"
+						min={ time.Now().Format("2006-01-02T15:04") }
+						class="input"
+					/>
+				</div>
+				<div class="flex items-center justify-center w-full flex-none">
+					<button type="submit" class="btn btn-primary w-full">
+						Submit
+					</button>
+				</div>
+			</div>
+		</form>
+		<div id="create-link-message" style="color: red;"></div>
+	</div>
 }
 
 templ urlInput(id, name string) {

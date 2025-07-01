@@ -1,7 +1,6 @@
 package page
 
 import "github.com/gkits/kurz/internal/views/component"
-import "github.com/gkits/kurz/internal/types"
 
 templ Home() {
 	<!DOCTYPE html>
@@ -23,9 +22,13 @@ templ Home() {
 }
 
 templ content() {
-	<div class="w-4/5 flex justify-center items-center">
+	<div
+		class="w-4/5 flex-col justify-center items-center"
+		hx-get="/links"
+		hx-swap="beforeend"
+		hx-trigger="load"
+	>
 		@component.Navbar("kurz")
 		@component.CreateLinkForm()
-		@component.LinkList([]types.Link{})
 	</div>
 }
