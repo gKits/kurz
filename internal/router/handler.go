@@ -73,7 +73,7 @@ func handleDeleteLink(ctx echo.Context) error {
 	if err := db.DeleteLink(ctx.Request().Context(), id); err != nil {
 		return echo.ErrInternalServerError
 	}
-	return ctx.NoContent(http.StatusNoContent)
+	return ctx.NoContent(http.StatusOK)
 }
 
 func handleRedirectToLink(ctx echo.Context) error {
