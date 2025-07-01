@@ -1,0 +1,34 @@
+package page
+
+import "github.com/gkits/kurz/internal/views/component"
+
+templ Home() {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Kurz</title>
+			<link rel="icon" type="image/x-icon" href="/public/favicon.ico"/>
+			<link href="/public/styles.css" rel="stylesheet"/>
+			<script src="https://unpkg.com/htmx.org@2.0.6"></script>
+		</head>
+		<body>
+			<div id="app">
+				@content()
+			</div>
+		</body>
+	</html>
+}
+
+templ content() {
+	<div
+		class="w-4/5 flex-col justify-center items-center"
+		hx-get="/links"
+		hx-swap="beforeend"
+		hx-trigger="load"
+	>
+		@component.Navbar("kurz")
+		@component.CreateLinkForm()
+	</div>
+}

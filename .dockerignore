@@ -1,0 +1,15 @@
+# Ignore everything
+*
+
+# Except
+!/migrations
+!/public
+
+!**.go
+!**.templ
+!/entrypoint.sh
+!/go.mod
+!/go.sum
+!/input.css
+!/package-lock.json
+!/package.json

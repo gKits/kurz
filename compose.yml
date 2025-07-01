@@ -1,0 +1,19 @@
+service:
+  server:
+    build: .
+    port:
+      - $KURZ__PORT:$KURZ__PORT
+    environment:
+      KURZ__PORT: $KURZ__PORT 
+      KURZ__DB_TYPE: $KURZ__DB_TYPE
+      KURZ__DB_HOST: $KURZ__DB_HOST
+      KURZ__DB_USER: $KURZ__DB_USER 
+      KURZ__DB_PASSWORD: $KURZ__DB_PASSWORD
+      KURZ__DB_PORT: $KURZ__DB_PORT 
+      KURZ__DB_NAME: $KURZ__DB_NAME
+
+  postgres:
+    image: postgres:alpine
+
+  mysql:
+    image: mysql:alpine
