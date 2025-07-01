@@ -1,7 +1,7 @@
 {
   "name": "kurz",
   "version": "1.0.0",
-  "description": "<div align=\"center\">   <a href=\"https://github.com/gkits/kurz\">     <img src=\"public/logo.png\" alt=\"Logo\" width=\"120\" height=\"120\">   </a>   <h1 align=\"center\">Kurz</h1>   <p align=\"center\">     Make your URL's kurz.   </p> </div>",
+  "description": "Just a link shortener written in Go + HTMX",
   "main": "daisyui-theme.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

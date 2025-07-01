@@ -37,3 +37,9 @@ wget https://raw.githubusercontent.com/gkits/kurz/refs/heads/main/compose.yml -o
 ```bash
 docker compose up -d
 ```
+
+## TODO
+
+- [ ] Implement OAuth
+- [ ] Github Actions pipeline
+  - [ ] Build and release docker image
