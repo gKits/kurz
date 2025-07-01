@@ -35,8 +35,9 @@ func handleGetLinks(ctx echo.Context) error {
 	if err := schema.NewDecoder().Decode(&q, ctx.QueryParams()); err != nil {
 		return echo.ErrBadRequest
 	}
-	links, err := db.GetLinks(ctx.Request().Context(), types.LinkQuery{})
+	links, err := db.GetLinks(ctx.Request().Context(), q)
 	if err != nil {
+		ctx.Logger().Error("failed to get links: ", err)
 		return err
 	}
 	return render(ctx, component.LinkList(links))
